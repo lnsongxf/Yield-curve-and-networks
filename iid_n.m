@@ -6,7 +6,7 @@ n = 8; % # nodes
 T = 50; % # periods forward running the risk free rate
 %m=12; %number of edges, maximum n(n-1)
 risk_ratio = 1;
-m = .015;
+m = .1;
 lambda= m; %internsity of distress
 eta=m*risk_ratio; %probability of recovery
 delta = .95; %time prefrence
@@ -104,16 +104,15 @@ end
 title(sprintf('i.i.d. network, n=%d',n))
 xlabel(sprintf('Maturity (t)'))
 ylabel(sprintf('Yield (R_f)'))
-axis([0,50,0,0.13]) %for comparison!
+axis([0,50,0,0.2]) %for comparison!
 
 
 
 legend(leg,'Location','northeast','Orientation','vertical')
 
 cd C:\Users\Oren\Documents\MATLAB\Network\figures
-print(iid_fig,'-dpng','-r100',...
-    sprintf('iid_net_n%d_lambda=%.2f.jpg',...
-    n,lambda))
+file_name = sprintf('iid_n%d_lambda0%.0f.jpg',n,lambda*100);
+print(iid_fig,'-dpng','-r100',file_name)
 
 
 
