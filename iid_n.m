@@ -5,13 +5,12 @@ clear; clc
 n = 8; % # nodes
 T = 50; % # periods forward running the risk free rate
 %m=12; %number of edges, maximum n(n-1)
-risk_ratio = .95;
-m = .4;
+risk_ratio = 1;
+m = .015;
 lambda= m; %internsity of distress
 eta=m*risk_ratio; %probability of recovery
-
 delta = .95; %time prefrence
-gamma = 4; %RRA parameter of CRRA
+gamma = 1; %RRA parameter of CRRA
 
 %Dividend at each state
 x(1) = 1; %x_lowerbar, value of idiosyncratic component at busat state
@@ -61,46 +60,65 @@ for t = 1:T
     %r(t,:) = (-log(sum(mpower(A,t),2)))/t+1;
 end
 
-
 %%
 
-%need to find n+1 states out of 2^n according to the sum of firms being
-%distressed.
+%{
+**************************************************************************
+                                FIGURES
+**************************************************************************
+%}
 
-%once I have a list of unique states
-
-%Figure adapted for n=4 case
 iid_fig = figure;
-plot(r(:,1)-1,'k') % 0 distressed
-hold on
-plot(r(:,9)-1,'b--') % 1 distressed
-hold on
-plot(r(:,10)-1,'r-.') % 2 distressed
-hold on
-plot(r(:,12)-1,'g.-') % 3 distressed
-hold on
-plot(r(:,16)-1,'c.-.') % 4 distressed
-%hold on
+leg = cell(1,n+1);
+%Center not distressed, i-1 periphery distressed
+
+% there are four colors, so grouping n states to 4 groups we have x in each
+% group: x = ceil((n-2)/4)
+state_num_in_group = ceil((n-2)/4);
+for i = 1:n+1
+    if i == 1
+        color_used = 'g--';
+    elseif i > 1 && i <= state_num_in_group+1
+        color_used = 'c-';
+    elseif i > 1*state_num_in_group+1 && i <= 2*state_num_in_group+1
+        color_used = 'b-';
+    elseif i > 2*state_num_in_group+1 && i <= 3*state_num_in_group+1
+        color_used = 'k-';
+    elseif i > 3*state_num_in_group+1 && i <= 4*state_num_in_group+1 && ...
+            i ~= n+1
+        color_used = 'm-';
+    elseif i == n+1
+        color_used = 'r-';        
+    end
+    
+    leg{i} = num2str(i-1);
+    if i == 1
+        plot(r(:,1)-1,color_used) % 0 distressed        
+    else
+        plot(r(:,2^(n-1)+2^(i-2))-1,color_used) % i-1 distressed
+    end
+    hold on
+end
 
 
-%axis([0,T,-.04,0.13])
-
-title(sprintf('No network, n=%d',n))
+title(sprintf('i.i.d. network, n=%d',n))
 xlabel(sprintf('Maturity (t)'))
 ylabel(sprintf('Yield (R_f)'))
-
-legend('0 distressed','1 distressed','2 distressed',...
-    '3 distressed','4 distressed',...
-    'Location','northeast','Orientation','vertical')
+axis([0,50,0,0.13]) %for comparison!
 
 
 
-%%
-%{
-cd C:\Users\Oren\Documents\MATLAB\Network
-print(iid_fig,'-djpeg',...
-    sprintf('iid-eta%.2f-lambda%.2f',eta,lambda))
-%}
+legend(leg,'Location','northeast','Orientation','vertical')
+
+cd C:\Users\Oren\Documents\MATLAB\Network\figures
+print(iid_fig,'-dpng','-r100',...
+    sprintf('iid_net_n%d_lambda=%.2f.jpg',...
+    n,lambda))
+
+
+
+
+
 
 
 
