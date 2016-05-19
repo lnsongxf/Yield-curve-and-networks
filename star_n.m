@@ -61,86 +61,69 @@ for t = 1:T
 end
 
 
-%%
+
+
+%{
+**************************************************************************
+                                FIGURES
+**************************************************************************
+%}
+
+%center distressed in full line -, and if not --
+%number if distressed in different color. 0 distressed in green, all
+%distressed in red, the rest in various colors.
 
 %Colors = {'g','b','c','k','r'};
 star_fig = figure;
-for i = 1:n+1
+leg = cell(1,2*n);
+%Center not distressed, i-1 periphery distressed
+
+% there are four colors, so grouping n states to 4 groups we have x in each
+% group: x = ceil((n-2)/4)
+state_num_in_group = ceil((n-2)/4);
+for i = 1:n
     if i == 1
-        color_used = 'g';
-    elseif i == 2 || i == 3
-        color_used = 'b';
-    elseif i == 4 || i == 5
-        color_used = 'c';
-    elseif i == 6 || i == 7
-        color_used = 'k';
-    else
-        color_used = 'r';
+        color_used = 'g--';
+    elseif i > 1 && i <= state_num_in_group+1
+        color_used = 'c--';
+    elseif i > 1*state_num_in_group+1 && i <= 2*state_num_in_group+1
+        color_used = 'b--';
+    elseif i > 2*state_num_in_group+1 && i <= 3*state_num_in_group+1
+        color_used = 'k--';
+    elseif i > 3*state_num_in_group+1 && i <= 4*state_num_in_group+1
+        color_used = 'm--';
     end
+    
+    leg{i} = strcat('0',num2str(i-1));
     plot(r(:,2^(i-1))-1,color_used) % i-1 periphery firm is distressed; center not
     hold on
 end
 
+%Center distressed, i-1 periphery distressed
 for i = 1:n
-    
-    if i == 1 || i == 2
-        color_used = 'b--';
-    elseif i == 3 || i == 4
-        color_used = 'c--';
-    elseif i == 5 || i == 6
-        color_used = 'k--';
-    elseif i == 7 || i == 8
-        color_used = 'r--';
+    if i <= 1*state_num_in_group
+        color_used = 'c-';    
+    elseif i > 1*state_num_in_group && i <= 2*state_num_in_group
+        color_used = 'b-';
+    elseif i > 2*state_num_in_group && i <= 3*state_num_in_group
+        color_used = 'k-';
+    elseif i > 3*state_num_in_group && i <= 4*state_num_in_group && i ~= n
+        color_used = 'm-';
+    elseif i == n
+        color_used = 'r-';    
     end
     
+    leg{i+n} = strcat('1',num2str(i-1));    
     plot(r(:,2^(n-1)+2^(i-1))-1,color_used) % 0 periphery firm is distressed; center yes
     hold on
 end
-%{
-plot(r(:,2^0)-1,'g') % 0 periphery firm is distressed; center not
-hold on
-plot(r(:,2^1)-1,'b') % 1 periphery firm is distressed; center not
-hold on
-plot(r(:,2^2)-1,'b') % 2 periphery firm is distressed; center not
-hold on
-plot(r(:,2^3)-1,'c') % 3 periphery firm is distressed; center not
-hold on
-plot(r(:,2^4)-1,'c') % 4 periphery firm is distressed; center not
-hold on
-plot(r(:,2^5)-1,'k') % 5 periphery firm is distressed; center not
-hold on
-plot(r(:,2^6)-1,'k') % 6 periphery firm is distressed; center not
-hold on
-plot(r(:,2^7)-1,'r') % 7 periphery firm is distressed; center not
-hold on
 
-plot(r(:,2^(n-1)+2^1)-1,'b--') % 1 periphery firm is distressed; center yes
-hold on
-plot(r(:,2^(n-1)+2^2)-1,'b--') % 2 periphery firm is distressed; center yes
-hold on
-plot(r(:,2^(n-1)+2^3)-1,'c--') % 3 periphery firm is distressed; center yes
-hold on
-plot(r(:,2^(n-1)+2^4)-1,'c--') % 4 periphery firm is distressed; center yes
-hold on
-plot(r(:,2^(n-1)+2^5)-1,'k--') % 5 periphery firm is distressed; center yes
-hold on
-plot(r(:,2^(n-1)+2^6)-1,'k--') % 6 periphery firm is distressed; center yes
-hold on
-plot(r(:,2^(n-1)+2^7)-1,'r--') % 7 periphery firm is distressed; center yes
-hold on
-%}
 title(sprintf('Star network, n=%d',n))
 xlabel(sprintf('Maturity (t)'))
 ylabel(sprintf('Yield (R_f)'))
-%axis([0,50,0,0.13])
+%axis([0,50,0,0.13]) %for comparison!
 
 
-leg = cell(1,2*n);
-
-for i = 1:n
-    leg{i} = strcat('0',num2str(i-1));
-    leg{i+n} = strcat('1',num2str(i-1));
-end
 
 legend(leg,'Location','northeast','Orientation','vertical')
 
@@ -149,15 +132,6 @@ print(star_fig,'-dpng','-r100',...
     sprintf('star_net_n%d_lambda=%.2f.jpg',...
     n,lambda))
 
-
-%{
-legend('No distress','1 periphery distressed',...
-    '2 periphery distressed','3 periphery distressed',...
-    'Only center distressed','Center & 1 periphery',...
-    'Center & 2 periphery','Center & 3 periphery',...
-    'Location','northeast','Orientation','vertical')
-%}    
-%%
 
 
 
